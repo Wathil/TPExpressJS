@@ -1,7 +1,6 @@
 const controller = require("../controllers/post.controller");
 
 module.exports = function (app) {
-    app.get("/api/rocketsp", controller.getAllRocketsP);
     app.get("/api/rockets", controller.getAllRockets);
     app.get("/api/rockets/:id", controller.getRocketById);
     app.post("/api/rockets", controller.createRocket);

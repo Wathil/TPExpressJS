@@ -3,80 +3,67 @@ const rocketModel = require("../models/").rocket;
 module.exports = {
 
     async getAllRockets(req, res) {
-        try {
-            const rocketCollection = await rocketModel.findAll();
-            if (rocketCollection)
-                res.status(201).send(rocketCollection);
-            else
-                res.status(404).send("No Rocket")
-        }
-        catch (e) {
-            console.log(e);
-            res.status(500).send(e);
-        }
+        rocketModel.findAll()
+            .then(data => {
+                if (data) res.status(201).send(data);
+                else res.status(404).send("No Rocket");
+            })
+            .catch(err => {
+                res.status(500).send({message: err.message || "Some error occurred while retrieving rockets."});
+            });
     },
     async getRocketById(req, res) {
-        try {
-            const rocketByPK = await rocketModel.findByPk(req.params.id);
-            if (rocketByPK)
-                res.status(201).send(rocketByPK);
-            else
-                res.status(404).send("Post Not Found")
-        }
-        catch (e) {
-            console.log(e);
-            res.status(500).send(e);
-        }
+        rocketModel.findByPk(req.params.id
+        ).then(data => {
+            if (data) res.status(201).send(data);
+            else res.status(404).send("No Rocket");
+        }).catch(err => {
+            res.status(500).send({ message: err.message || "Some error occurred while retrieving a rocket." });
+        });
     },
     async createRocket(req, res) {
-        try {
-            const rocketCreated = await rocketModel.create({
-                nom: req.body.nom,
-                annee: req.body.annee,
-                organisation: req.body.organisation,
-                destination: req.body.destination
-            });
+        rocketModel.create({
+            nom: req.body.nom,
+            annee: req.body.annee,
+            organisation: req.body.organisation,
+            destination: req.body.destination
+        }).then(rocketCreated => {
             res.status(201).send(rocketCreated)
-        }
-        catch (e) {
-            console.log(e);
-            res.status(400).send(e);
-        }
+        }).catch(err => {
+            res.status(400).send({ message: err.message || "Some error occurred while retrieving rockets." });
+        });
     },
     async updateRocket(req, res) {
-        try {
-            const rocketByPK = await rocketModel.findByPk(req.params.id);
-            if (rocketByPK) {
-                const updatedRocket = await rocketByPK.update({
-                    nom: req.body.nom, // body
-                    annee: req.body.annee, // body
-                    organisation: req.body.organisation, // body
-                    destination: req.body.destination // body
-                })
-                res.status(201).send(updatedRocket);
-            }
-            else {
-                res.status(404).send("Rocket " + id + "Not Found");
-            }
-        }
-        catch (e) {
-            console.log(e);
-            res.status(400).send(e);
-        }
+        rocketModel.findByPk(req.params.id)
+            .then(rocketByPK => {
+                if (rocketByPK) {
+                    rocketByPK.update({
+                        nom: req.body.nom, // body
+                        annee: req.body.annee, // body
+                        organisation: req.body.organisation, // body
+                        destination: req.body.destination // body
+                    }).then(updatedRocket => {
+                        res.status(201).send(updatedRocket);
+                    }).catch(err => {
+                        res.status(404).send({ message: err.message || "Some error occurred while retrieving rockets." });
+                    })
+                }
+            }).catch(err => {
+                res.status(404).send({ message: err.message || "Some error occurred while retrieving rockets." });
+            });
     },
     async deleteRocket(req, res) {
-        try {
-            const rocketCollection = await rocketModel.findByPk(req.params.id);
+        rocketModel.findByPk(req.params.id)
+        .then(rocketCollection => {
             if (rocketCollection) {
                 rocketCollection.destroy();
                 res.status(201).send("Deleted");
             }
             else
-                re.status(404).send("User Not Found")
-        }
-        catch (e) {
-            console.log(e);
-            res.status(400).send(e);
-        }
+                re.status(404).send("Rocket Not Found")
+        }).catch(err => {
+            console.log(err);
+            res.status(400).send({ message: err.message || "Some error occurred while retrieving rockets." });
+        })
     }
 };
